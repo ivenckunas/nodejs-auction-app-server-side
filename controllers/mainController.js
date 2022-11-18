@@ -1,58 +1,39 @@
-const userSchema = require("../schemas/userSchema")
-const sendRes = require("../modules/sendRes")
-const productSchema = require("../schemas/itemSchema")
-const boughtSchema = require("../schemas/boughtProducts")
-const bcrypt = require("bcrypt")
-const {wordToGuess, makeGuess} = require("../modules/gameLogic")
-const e = require("express");
+const userSchema = require('../schemas/userSchema');
+const bcrypt = require('bcrypt');
+const { uid } = require('uid')
 
 
 module.exports = {
     register: async (req, res) => {
-        const {email, passOne} = req.body
-
-        const password = await bcrypt.hash(passOne, 10)
-
-        const user = new userSchema({
-            email,
-            password
-        })
-
-        await user.save()
-
-        sendRes(res, "registration ok", false)
-    },
-    login: async (req, res) => {
-        const {email, password} = req.body
-
-        const user = await userSchema.findOne({email})
-
-        if(!user) return sendRes(res, "user not found by email", true)
-
-        const compare = await bcrypt.compare(password, user.password)
-        console.log(compare)
-
-        if(!compare) return sendRes(res, "bad password", true)
-
-        req.session.user = user
-
-        return sendRes(res, "login is ok", false, {user})
-    },
-    autoLogin: async (req, res) => {
-
-        if(req.session.user) {
-            const {email} = req.session.user
-            const user = await userSchema.findOne({email})
-
-            return sendRes(res, "login is ok", false, {user})
+        const { email, password } = req.body;
+        const userExists = await userSchema.findOne({ email });
+        console.log('userExists ===', userExists);
+        if (userExists) {
+            res.send({ error: true, message: 'user already exists', data: null });
+            return
         }
 
+        // JEIGU NERASTAS USERIS, REGISTRUOJAM NAUJA
 
-        sendRes(res, "no user session", true, null)
+        const hashedPsw = await bcrypt.hash(password, 10)
+        const secret = uid(30);
+        const newUser = new userSchema({ email, hashedPsw, secret });
+        await newUser.save();
+
+
+        res.send({ error: false, message: 'registered successfully', data: newUser })
     },
-    logout: async (req, res) => {
-        delete req.session.user
-        sendRes(res, "session removed", false, null)
-    }
 
+    login: async (req, res) => {
+        const { email, password } = req.body;
+
+        const userExists = await userSchema.findOne({ email, password });
+        if (!userExists) return res.send({ error: true, message: 'user does not exist. Please register first', data: null });
+
+        const comparedPsw = await bcrypt.compare(password, userExists.hashedPsw)
+        if (!comparedPsw) return res.send({ error: true, message: 'wrong credentials', data: null });
+
+        res.send({ error: false, message: 'successfully logged in', data: { email: userExists.email, secret: userExists.secret, photo: userExists.photo } })
+
+    },
 }
