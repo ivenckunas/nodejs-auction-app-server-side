@@ -2,6 +2,11 @@ const userSchema = require('../schemas/userSchema');
 const bcrypt = require('bcrypt');
 const { uid } = require('uid');
 const itemSchema = require('../schemas/itemSchema');
+const { MongoClient } = require('mongodb');
+
+const URI = "mongodb+srv://admin:admin@cluster1.3gshm1s.mongodb.net/?retryWrites=true&w=majority"
+
+const client = new MongoClient(URI);
 
 
 module.exports = {
@@ -46,5 +51,12 @@ module.exports = {
 
 
         res.send({ error: false, message: 'item uploaded successfully', data: newItem })
+    },
+
+    getAllItems: async (req, res) => {
+        const con = await client.connect();
+        const data = await con.db("test").collection("type12items-atsiskaitymas").find().toArray();
+        await con.close();
+        return res.send(data);
     }
 }
