@@ -1,6 +1,7 @@
 const userSchema = require('../schemas/userSchema');
 const bcrypt = require('bcrypt');
-const { uid } = require('uid')
+const { uid } = require('uid');
+const itemSchema = require('../schemas/itemSchema');
 
 
 module.exports = {
@@ -36,4 +37,14 @@ module.exports = {
         res.send({ error: false, message: 'successfully logged in', data: { email: userExists.email, secret: userExists.secret, photo: userExists.photo } })
 
     },
+
+    postItem: async (req, res) => {
+        const { image, title, time, price } = req.body
+
+        const newItem = new itemSchema({ image, title, time, price });
+        await newItem.save();
+
+
+        res.send({ error: false, message: 'item uploaded successfully', data: newItem })
+    }
 }
