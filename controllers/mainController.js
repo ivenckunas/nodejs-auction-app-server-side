@@ -44,9 +44,9 @@ module.exports = {
     },
 
     postItem: async (req, res) => {
-        const { image, title, time, price } = req.body
+        const { image, title, date, price } = req.body
 
-        const newItem = new itemSchema({ image, title, time, price });
+        const newItem = new itemSchema({ image, title, date, price });
         await newItem.save();
 
 
@@ -56,7 +56,6 @@ module.exports = {
     getAllItems: async (req, res) => {
         const con = await client.connect();
         const data = await con.db("test").collection("type12items-atsiskaitymas").find().toArray();
-        await con.close();
         return res.send(data);
     }
 }

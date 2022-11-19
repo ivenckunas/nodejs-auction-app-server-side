@@ -7,8 +7,8 @@ const { validateReg } = require("../middleware/validator");
 
 router.post('/register', validateReg, register)
 router.post('/login', login)
-router.post('/postItem', postItem)
-router.get('/allItems', getAllItems)
+router.post('/post-item', postItem)
+router.get('/all-items', getAllItems)
 
 
 
