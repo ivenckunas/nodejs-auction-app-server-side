@@ -18,6 +18,10 @@ const itemSchema = new Schema({
     type: Number,
     required: true,
   },
+  bid: {
+    type: Number,
+    required: true,
+  }
 
 })
 
