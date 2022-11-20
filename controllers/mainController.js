@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const { uid } = require('uid');
 const itemSchema = require('../schemas/itemSchema');
 const { MongoClient } = require('mongodb');
-const { db } = require('../schemas/userSchema');
 
 const URI = "mongodb+srv://admin:admin@cluster1.3gshm1s.mongodb.net/?retryWrites=true&w=majority"
 
@@ -45,9 +44,9 @@ module.exports = {
     },
 
     postItem: async (req, res) => {
-        const { image, title, date, price, bid } = req.body
+        const { image, title, date, price, bid, bidder } = req.body
 
-        const newItem = new itemSchema({ image, title, date, price, bid });
+        const newItem = new itemSchema({ image, title, date, price, bid, bidder });
         await newItem.save();
 
 
@@ -57,13 +56,16 @@ module.exports = {
     getAllItems: async (req, res) => {
         const con = await client.connect();
         const data = await con.db("test").collection("type12items-atsiskaitymas").find().toArray();
-        return res.send(data);
+        res.send({ error: false, message: 'all items downloaded successfully', data: data })
+
     },
 
     updateBid: async (req, res) => {
+
         const itemId = req.body.itemId._id
         const bid = req.body.bid
-        const item = await itemSchema.findOneAndUpdate({ _id: itemId }, { bid: bid });
+        const bidder = req.body.bidder
+        const item = await itemSchema.findOneAndUpdate({ _id: itemId }, { bid: bid, bidder: bidder });
 
         res.send(item)
 

@@ -21,6 +21,10 @@ const itemSchema = new Schema({
   bid: {
     type: Number,
     required: true,
+  },
+  bidder: {
+    type: String,
+    required: true,
   }
 
 })
