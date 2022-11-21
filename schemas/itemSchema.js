@@ -25,8 +25,10 @@ const itemSchema = new Schema({
   bidder: {
     type: String,
     required: true,
+  },
+  bidHistory: {
+    type: Array,
   }
-
 })
 
 module.exports = mongoose.model('type12items-atsiskaitymas', itemSchema)

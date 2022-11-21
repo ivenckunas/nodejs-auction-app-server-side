@@ -6,8 +6,6 @@ const app = express()
 const mainRouter = require("./router/mainRouter")
 const mongoose = require("mongoose")
 const http = require('http').createServer(app);
-const socketIo = require('socket.io');
-const socketRouter = require('./router/socketRouter');
 
 const PORT = process.env.PORT || 5000
 
@@ -19,14 +17,6 @@ mongoose.connect(process.env.MONGO_KEY)
     }).catch((e) => {
         console.log("ERROR", e)
     })
-
-const io = socketIo(http, {
-    cors: {
-        origin: 'http://localhost:3000',
-    },
-});
-
-app.set('socketio', io);
 
 app.use(express.json())
 app.use(
@@ -40,7 +30,6 @@ app.use(
 app.use(cors())
 
 app.use('/', mainRouter)
-socketRouter(io);
 
 
 
